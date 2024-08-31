@@ -21,9 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "tsk_main.h"
-#include "ICM_20948.h"
-#include "math.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -49,14 +47,7 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
-bool success;
-uint8_t IMUdata[8];
-unsigned long long time;
-double q0, q1, q2, q3;
-float roll, pitch, yaw;
-float ax, ay, az;
-float gx, gy, gz;
-float mx, my, mz;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -107,46 +98,6 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   Setup();
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
-  ICM_20948_I2C myICM;
-
-  bool initialized = false;
-  while (!initialized)
-  {
-    myICM.begin();
-	if (myICM.status != ICM_20948_Stat_Ok)
-	{
-	  HAL_Delay(50);
-	}
-	else
-	{
-	  initialized = true;
-	}
-  }
-
-  // Initialize the digital motion processor
-  success = true; // Use success to show if the DMP configuration was successful
-  success &= ( myICM.initializeDMP() == ICM_20948_Stat_Ok );
-
-  success &= ( myICM.enableDMPSensor(INV_ICM20948_SENSOR_ORIENTATION) == ICM_20948_Stat_Ok );
-  success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_RAW_GYROSCOPE) == ICM_20948_Stat_Ok);
-  success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_RAW_ACCELEROMETER) == ICM_20948_Stat_Ok);
-  success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_MAGNETIC_FIELD_UNCALIBRATED) == ICM_20948_Stat_Ok);
-
-  success &= ( myICM.setDMPODRrate(DMP_ODR_Reg_Quat9, 0) == ICM_20948_Stat_Ok ); // Set to the maximum
-  success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Accel, 0) == ICM_20948_Stat_Ok); // Set to the maximum
-  success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Gyro, 0) == ICM_20948_Stat_Ok); // Set to the maximum
-  success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Cpass, 0) == ICM_20948_Stat_Ok); // Set to the maximum
-
-  success &= ( myICM.enableFIFO() == ICM_20948_Stat_Ok );
-  success &= ( myICM.enableDMP() == ICM_20948_Stat_Ok );
-  success &= ( myICM.resetDMP() == ICM_20948_Stat_Ok );
-  success &= ( myICM.resetFIFO() == ICM_20948_Stat_Ok );
-
-  if ( success )
-  {
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
-  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -154,65 +105,6 @@ int main(void)
   while (1)
   {
     Loop();
-    icm_20948_DMP_data_t data;
-    myICM.readDMPdataFromFIFO(&data);
-
-    if ( ( myICM.status == ICM_20948_Stat_Ok ) || ( myICM.status == ICM_20948_Stat_FIFOMoreDataAvail ) ) // Was valid data available?
-    {
-
-      if ( ( data.header & DMP_header_bitmap_Quat9 ) > 0 ) // We have asked for orientation data so we should receive Quat9
-      {
-    	q1 = ( (double)data.Quat9.Data.Q1 ) / 1073741824.0; // Convert to double. Divide by 2^30
-    	q2 = ( (double)data.Quat9.Data.Q2 ) / 1073741824.0; // Convert to double. Divide by 2^30
-    	q3 = ( (double)data.Quat9.Data.Q3 ) / 1073741824.0; // Convert to double. Divide by 2^30
-    	q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
-    	float q2sqr = q2 * q2;
-
-    	// Roll
-        float t0 = +2.0 * (q0 * q1 + q2 * q3);
-        float t1 = +1.0 - 2.0 * (q1 * q1 + q2sqr);
-        roll = atan2(t0, t1) * 180.0 / M_PI;
-
-        // Pitch
-        float t2 = +2.0 * (q0 * q2 - q3 * q1);
-        t2 = (t2 > 1.0) ? 1.0 : t2;
-        t2 = (t2 < -1.0) ? -1.0 : t2;
-        pitch = asin(t2) * 180.0 / M_PI;
-
-        // Yaw
-        float t3 = +2.0 * (q0 * q3 + q1 * q2);
-        float t4 = +1.0 - 2.0 * (q2sqr + q3 * q3);
-        yaw = atan2(t3, t4) * 180.0 / M_PI;
-
-        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_8);
-      }
-
-      if ( ( data.header & DMP_header_bitmap_Accel ) > 0 ) // Check for Accel
-      {
-        ax = (float)data.Raw_Accel.Data.X; // Extract the raw accelerometer data
-      	ay = (float)data.Raw_Accel.Data.Y;
-      	az = (float)data.Raw_Accel.Data.Z;
-      }
-
-      if ( ( data.header & DMP_header_bitmap_Gyro ) > 0 ) // Check for Gyro
-      {
-        gx = (float)data.Raw_Gyro.Data.X; // Extract the raw gyro data
-        gy = (float)data.Raw_Gyro.Data.Y;
-        gz = (float)data.Raw_Gyro.Data.Z;
-      }
-
-      if ( ( data.header & DMP_header_bitmap_Compass ) > 0 ) // Check for Compass
-      {
-        mx = (float)data.Compass.Data.X; // Extract the compass data
-        my = (float)data.Compass.Data.Y;
-        mz = (float)data.Compass.Data.Z;
-      }
-    }
-
-//   	if ( myICM.status != ICM_20948_Stat_FIFOMoreDataAvail ) // If more data is available then we should read it right away - and not delay
-//    {
-//      HAL_Delay(5);
-//    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -438,6 +330,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
 HAL_StatusTypeDef I2C_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t length, uint8_t *data)
 {
   return HAL_I2C_Mem_Write(&hi2c1, slave_addr << 1, reg_addr, I2C_MEMADD_SIZE_8BIT, data, length, 10);

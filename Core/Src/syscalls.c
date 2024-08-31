@@ -30,6 +30,7 @@
 #include <sys/time.h>
 #include <sys/times.h>
 
+#include "main.h"
 
 /* Variables */
 extern int __io_putchar(int ch) __attribute__((weak));
@@ -39,6 +40,13 @@ extern int __io_getchar(void) __attribute__((weak));
 char *__env[1] = { 0 };
 char **environ = __env;
 
+int __io_putchar(int ch)
+{
+  // Write character to ITM ch.0
+  //ITM_SendChar(ch);
+  HAL_UART_Transmit(&huart2, (uint8_t *) &ch, 1, 0xffff);
+  return(ch);
+}
 
 /* Functions */
 void initialise_monitor_handles()
