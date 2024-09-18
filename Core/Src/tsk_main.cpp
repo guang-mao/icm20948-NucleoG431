@@ -7,26 +7,52 @@
 #include "main.h"
 #include "ICM_20948.h"
 #include "math.h"
-#include "MadgwickAHRS.h"
+#include "Adafruit_AHRS_Madgwick.h"
+#include "uNavAHRS.h"
 
 /* Private variables ---------------------------------------------------------*/
 float roll, pitch, yaw;
+
 // unit g
-float ax, ay, az;
-// unit rad/s
-float gx, gy, gz;
-float g_offset[3] = {-0.718654335f, -0.0836905688f, -0.171692878f};
-// unit uT
-float mx, my, mz;
-float mag_offset[3] = {-6.58f, 20.96f, -11.87f};
-float mag_softiron_matrix[3][3] = {
-    { 1.039f, 0.000f, 0.001f},
-    { 0.000f, 1.003f, -0.002f},
-    { 0.001f, -0.002f, 0.959f},
+float Fa[3][3] = {
+  {+1.00021f, +0.00201f, +0.02555f},
+  {+0.02085f, +1.00252f, +0.01340f},
+  {-0.01943f, -0.00301f, +1.00331f}
 };
-float mag_field = 22.11f;
-// unit second
-float dt = 0.0f;
+float Ka[3][3] = {
+  {+0.99934f, -0.00208f, -0.02542f},
+  {-0.02104f, +0.99749f, -0.01279f},
+  {+0.01929f, +0.00295f, +0.99617f}
+};
+float delta_acc[3] = {-0.00612f, -0.02053f, +0.00627f};
+
+float filter_acc[3] = {0.0f};
+float acc_result[3] = {0.0f};
+
+// unit rad/s
+float g_offset[3] = {-0.538f, -0.048, -0.249f};
+float gyr_result[3] = {0.0f};
+// unit uT
+float mag_result[3] = {0.0f};
+
+#if 1
+//float mag_hard_iron[3] = {0.00f, 0.00f, 0.00f};
+float mag_hard_iron[3] = {-12.139564f, +31.953657f, -18.385916f};
+float mag_soft_iron[3][3] = {
+    { +1.809586f, -0.015683f, +0.041884f},
+    { -0.015683f, +1.784187f, +0.006941f},
+    { +0.041884f, +0.006941f, +1.740622f},
+};
+#else
+float mag_hard_iron[3] = {-8.64f, 17.64f, -11.71f};
+float mag_soft_iron[3][3] = {
+    { +1.059f, -0.070f, +0.002f},
+    { -0.070f, +0.908f, +0.022f},
+    { +0.002f, +0.022f, +1.045f},
+};
+#endif
+
+float mag_field = 22.13f;
 
 ICM_20948_I2C myICM;
 
@@ -34,18 +60,23 @@ BOOTSTAGE_t bootstage = INIT;
 
 uint32_t bootTick = 0;
 
-MadgwickAHRS filter;
+Adafruit_Madgwick madgwick_filter(0.5f);
+
+// a uNavAHRS object
+uNavAHRS ekf_Filter;
 
 /* Private function prototypes -----------------------------------------------*/
-void printScaledAGMT(ICM_20948_I2C *sensor);
+void inverse3x3(float matrix[3][3], float result[3][3]);
 
 void Setup()
 {
   // DWT tick Init...
   if ( DWT_Init() )
   {
-    printf("DWT Initialize failed...\n");
+    printf("DWT Initialize failed...\r\n");
   }
+
+  ekf_Filter.setInitializationDuration(5000);
 
   // ICM-20948 Init...
   bool initialized = false;
@@ -53,16 +84,17 @@ void Setup()
   while ( !initialized )
   {
     myICM.begin();
-
+    printf("Initialization of the sensor returned: ");
+    printf(myICM.statusString());
+    printf("\r\n");
     if ( myICM.status != ICM_20948_Stat_Ok )
     {
-      printf("Initialized failed!...\n");
-      HAL_Delay(50);
+      printf("Trying again...\r\n");
+      HAL_Delay(500);
     }
     else
     {
       initialized = true;
-      printf("Initialized successful!...\n");
     }
   }
 
@@ -72,10 +104,9 @@ void Setup()
   {
     printf("Software Reset returned: ");
     printf(myICM.statusString());
-    printf("\n");
+    printf("\r\n");
   }
-
-  HAL_Delay(100);
+  HAL_Delay(250);
 
   // Now wake the sensor up
   myICM.sleep(false);
@@ -87,11 +118,11 @@ void Setup()
   // options: ICM_20948_Sample_Mode_Continuous
   //          ICM_20948_Sample_Mode_Cycled
   myICM.setSampleMode((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), ICM_20948_Sample_Mode_Continuous);
-  if ( myICM.status != ICM_20948_Stat_Ok )
+  if (myICM.status != ICM_20948_Stat_Ok)
   {
     printf("setSampleMode returned: ");
     printf(myICM.statusString());
-    printf("\n");
+    printf("\r\n");
   }
 
   // Set full scale ranges for both acc and gyr
@@ -103,24 +134,23 @@ void Setup()
                   // gpm8
                   // gpm16
 
-  myFSS.g = dps250; // (ICM_20948_GYRO_CONFIG_1_FS_SEL_e)
+  myFSS.g = dps500; // (ICM_20948_GYRO_CONFIG_1_FS_SEL_e)
                     // dps250
                     // dps500
                     // dps1000
                     // dps2000
 
   myICM.setFullScale((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myFSS);
-
   if ( myICM.status != ICM_20948_Stat_Ok )
   {
     printf("setFullScale returned: ");
     printf(myICM.statusString());
-    printf("\n");
+    printf("\r\n");
   }
 
   // Set up Digital Low-Pass Filter configuration
   ICM_20948_dlpcfg_t myDLPcfg;    // Similar to FSS, this uses a configuration structure for the desired sensors
-  myDLPcfg.a = acc_d473bw_n499bw; // (ICM_20948_ACCEL_CONFIG_DLPCFG_e)
+  myDLPcfg.a = acc_d246bw_n265bw; // (ICM_20948_ACCEL_CONFIG_DLPCFG_e)
                                   // acc_d246bw_n265bw      - means 3db bandwidth is 246 hz and nyquist bandwidth is 265 hz
                                   // acc_d111bw4_n136bw
                                   // acc_d50bw4_n68bw8
@@ -129,7 +159,7 @@ void Setup()
                                   // acc_d5bw7_n8bw3        - means 3 db bandwidth is 5.7 hz and nyquist bandwidth is 8.3 hz
                                   // acc_d473bw_n499bw
 
-  myDLPcfg.g = gyr_d361bw4_n376bw5; // (ICM_20948_GYRO_CONFIG_1_DLPCFG_e)
+  myDLPcfg.g = gyr_d196bw6_n229bw8; // (ICM_20948_GYRO_CONFIG_1_DLPCFG_e)
                                     // gyr_d196bw6_n229bw8
                                     // gyr_d151bw8_n187bw6
                                     // gyr_d119bw5_n154bw3
@@ -144,7 +174,7 @@ void Setup()
   {
     printf("setDLPcfg returned: ");
     printf(myICM.statusString());
-    printf("\n");
+    printf("\r\n");
   }
 
   // Choose whether or not to use DLPF
@@ -153,22 +183,23 @@ void Setup()
   ICM_20948_Status_e gyrDLPEnableStat = myICM.enableDLPF(ICM_20948_Internal_Gyr, false);
   printf("Enable DLPF for Accelerometer returned: ");
   printf(myICM.statusString(accDLPEnableStat));
-  printf("\n");
+  printf("\r\n");
   printf("Enable DLPF for Gyroscope returned: ");
   printf(myICM.statusString(gyrDLPEnableStat));
-  printf("\n");
+  printf("\r\n");
 
   // Choose whether or not to start the magnetometer
   myICM.startupMagnetometer();
-
   if ( myICM.status != ICM_20948_Stat_Ok )
   {
     printf("startupMagnetometer returned: ");
     printf(myICM.statusString());
-    printf("\n");
+    printf("\r\n");
   }
 
-  //
+  printf("\r\n");
+  printf("Configuration complete!\r\n");
+
   bootTick = HAL_GetTick();
 }
 
@@ -176,302 +207,175 @@ void Loop()
 {
   if ( myICM.dataReady() )
   {
-    float raw_acc[3] = {0.0f}, raw_gyr[3] = {0.0f}, raw_mag[3] = {0.0f};
-
     myICM.getAGMT();  // The values are only updated when you call 'getAGMT'
 
-    raw_acc[0] = myICM.accX();
-
-    raw_acc[1] = myICM.accY();
-
-    raw_acc[2] = myICM.accZ();
-
-    raw_gyr[0] = myICM.gyrX();
-
-    raw_gyr[1] = myICM.gyrY();
-
-    raw_gyr[2] = myICM.gyrZ();
-
-    raw_mag[0] = myICM.magX();
-
-    raw_mag[1] = myICM.magY();
-
-    raw_mag[2] = myICM.magZ();
-
-//    float x = (float) ( myICM.agmt.mag.axes.x - mag_offset[0] );
-//
-//    float y = (float) ( myICM.agmt.mag.axes.y - mag_offset[1] );
-//
-//    float z = (float) ( myICM.agmt.mag.axes.z - mag_offset[2] );
-//
-//    raw_mag[0] = x * mag_softiron_matrix[0][0] + y * mag_softiron_matrix[0][1] + z * mag_softiron_matrix[0][2];
-//
-//    raw_mag[1] = x * mag_softiron_matrix[1][0] + y * mag_softiron_matrix[1][1] + z * mag_softiron_matrix[1][2];
-//
-//    raw_mag[2] = x * mag_softiron_matrix[2][0] + y * mag_softiron_matrix[2][1] + z * mag_softiron_matrix[2][2];
-
-//    printf("Raw:");
-//
-//    printf("%d", myICM.agmt.acc.axes.x);
-//    printf(",");
-//    printf("%d", myICM.agmt.acc.axes.y);
-//    printf(",");
-//    printf("%d", myICM.agmt.acc.axes.z);
-//    printf(",");
-//
-//    printf("%d", myICM.agmt.gyr.axes.x);
-//    printf(",");
-//    printf("%d", myICM.agmt.gyr.axes.y);
-//    printf(",");
-//    printf("%d", myICM.agmt.gyr.axes.z);
-//    printf(",");
-
-//    printf("Raw:");
-    printf("%d", myICM.agmt.mag.axes.x); // xyz xzy yxz yzx zyx
-    printf(",");
-    printf("%d", myICM.agmt.mag.axes.y);
-    printf(",");
-    printf("%d", myICM.agmt.mag.axes.z);
-    printf("\n");
-
-//    printf("Cal:");
-//    printf("%.1f", raw_mag[0]); // xyz xzy yxz yzx zyx
-//    printf(" ");
-//    printf("%.1f", raw_mag[1]);
-//    printf(" ");
-//    printf("%.1f", raw_mag[2]);
-//    printf("\n");
-
-//    printf("Uni:");
-//
-//    printf("%f", raw_acc[0]);
-//    printf(",");
-//    printf("%f", raw_acc[1]);
-//    printf(",");
-//    printf("%f", raw_acc[2]);
-//    printf(",");
-//
-//    printf("%f", raw_gyr[0]);
-//    printf(",");
-//    printf("%f", raw_gyr[1]);
-//    printf(",");
-//    printf("%f", raw_gyr[2]);
-//    printf(",");
-//
-//    printf("%f", raw_mag[0]);
-//    printf(",");
-//    printf("%f", raw_mag[1]);
-//    printf(",");
-//    printf("%f", raw_mag[2]);
-//    printf("\n");
-
-    switch ( bootstage )
+    float gyr[3] = { myICM.gyrX(), myICM.gyrY(), myICM.gyrZ()};
+    for ( uint8_t i = 0; i < 3; i++ )
     {
-      case INIT: {
-        bootstage = CALIBRA;
-        bootTick = HAL_GetTick();
-        break;
-      }
-      case CALIBRA: {
-//        if ( ( HAL_GetTick() - bootTick ) > 1000 )
-        {
-          bootstage = RUN;
-        }
-//        else
-//        {
-//          g_offset[0] = g_offset[0] * 15.0f / 16.0f +  raw_gyr[0] / 16.0f;
-//          g_offset[1] = g_offset[1] * 15.0f / 16.0f +  raw_gyr[1] / 16.0f;
-//          g_offset[2] = g_offset[2] * 15.0f / 16.0f +  raw_gyr[2] / 16.0f;
-//
-//          m_offset[0] = m_offset[0] * 15.0f / 16.0f +  raw_mag[0] / 16.0f;
-//          m_offset[1] = m_offset[1] * 15.0f / 16.0f +  raw_mag[1] / 16.0f;
-//          m_offset[2] = m_offset[2] * 15.0f / 16.0f +  raw_mag[2] / 16.0f;
-//        }
-        break;
-      }
-      case RUN: {
-#if 0
-          ax = raw_acc[0];
-
-          ay = raw_acc[1];
-
-          az = raw_acc[2];
-
-          gx = ( raw_gyr[0] - g_offset[0] );
-
-          gy = ( raw_gyr[1] - g_offset[1] );
-
-          gz = ( raw_gyr[2] - g_offset[2] );
-
-          mx = raw_mag[0];
-
-          my = raw_mag[1];
-
-          mz = raw_mag[2];
-
-          filter.MadgwickAHRSupdate(gx, gy, gz, ax, ay, az, mx, my, mz);
-
-          // Roll
-          roll = filter.getRoll();
-
-          // Pitch
-          pitch = filter.getPitch();
-
-          // Yaw
-          yaw = filter.getYaw();
-#endif
-        break;
-      }
+      gyr_result[i] = gyr[i] - g_offset[i];
     }
 
-    //printScaledAGMT(&myICM);      // This function takes into account the scale settings from when the measurement was made to calculate the values with units
+    float acc[3] = { myICM.accX() / 1000.0f, myICM.accY() / 1000.0f, myICM.accZ() / 1000.0f};
 
-    HAL_Delay(10);
+    float acc_neutral[3] = {0.0f};
 
+    for ( uint8_t i = 0; i < 3; i++ )
+    {
+      acc_neutral[i] = acc[i] - delta_acc[i];
+    }
+
+    for ( uint8_t j = 0; j < 3; j++ )
+    {
+      acc_result[j] = Ka[j][0] * acc_neutral[0] + Ka[j][1] * acc_neutral[1] + Ka[j][2] * acc_neutral[2];
+    }
+
+//    printf("Acc X axis: %.5f\r\n", acc_result[0]);
+//    printf("Acc Y axis: %.5f\r\n", acc_result[1]);
+//    printf("Acc Z axis: %.5f\r\n", acc_result[2]);
+   //    printf("Pitch: %.1f, ", pitch);
+   //    printf("Raw Yaw: %.1f, ", raw_yaw);
+   //    printf("Yaw: %.1f\n", yaw);
+
+#if 1
+    float mag[3] = {myICM.magX(), myICM.magY(), myICM.magZ()};
+
+    float mag_neutral[3];
+
+    for ( uint8_t i = 0; i < 3; i++ )
+    {
+      mag_neutral[i] = mag[i] - mag_hard_iron[i];
+    }
+
+    for ( uint8_t j = 0; j < 3; j++ )
+    {
+      mag_result[j] = mag_soft_iron[j][0] * mag_neutral[0] + mag_soft_iron[j][1] * mag_neutral[1] + mag_soft_iron[j][2] * mag_neutral[2];
+    }
+#endif
+
+#if 0
+//     'Raw' values to match expectation of MOtionCal
+    printf("Raw:");
+    printf("0"); printf(",");// myICM.agmt.acc.axes.x
+    printf("0"); printf(",");
+    printf("0"); printf(",");
+    printf("0"); printf(",");// myICM.agmt.gyr.axes.x
+    printf("0"); printf(",");
+    printf("0"); printf(",");
+    printf("%d", myICM.agmt.mag.axes.x); printf(",");
+    printf("%d", myICM.agmt.mag.axes.y); printf(",");
+    printf("%d", myICM.agmt.mag.axes.z); printf("\r\n");
+
+    float i = 0.0f;
+    // unified data
+    printf("Uni:");
+    printf("%.1f", i); printf(","); //myICM.accX() * 9.81 / 1000.0f
+    printf("%.1f", i); printf(",");
+    printf("%.1f", i); printf(",");
+    printf("%.4f", i); printf(","); // myICM.gyrX()
+    printf("%.4f", i); printf(",");
+    printf("%.4f", i); printf(",");
+    printf("%.1f", mag_result[0]); printf(",");
+    printf("%.1f", mag_result[1]); printf(",");
+    printf("%.1f", mag_result[2]); printf("\r\n");
+#else
+    static uint32_t lastTick = 0;
+
+    uint32_t now = micros();
+
+    float elapse_dt = ( now - lastTick ) / 1000000.0f;
+
+#if 1
+//    madgwick_filter.update(gyr_result[0], gyr_result[1], gyr_result[2], acc_result[0], acc_result[1], acc_result[2], mag[0], mag[1], mag[2], elapse_dt);
+
+    // extended kalman filter...
+    float gyro_rad[3], acc_mss[3];
+    for ( uint8_t i = 0; i < 3; i++ )
+    {
+      gyro_rad[i] = gyr_result[i] * 0.0174533f;
+      acc_mss[i] = acc_result[i] * 9.81f;
+    }
+//    acc_mss[2] = -acc_mss[2];
+    ekf_Filter.update(gyro_rad[0], gyro_rad[1], gyro_rad[2], \
+                      acc_mss[0], acc_mss[1], acc_mss[2], \
+                      mag[0], mag[1], mag[2]);
+
+#else
+    madgwick_filter.updateIMU(myICM.gyrX(), myICM.gyrY(), myICM.gyrZ(), myICM.accX(), myICM.accY(), myICM.accZ(), elapse_dt);
+#endif
+
+    // Roll
+//    roll = madgwick_filter.getRoll();
+//
+//    // Pitch
+//    pitch = madgwick_filter.getPitch();
+//
+//    // Yaw
+//    yaw = madgwick_filter.getYaw();
+
+//    float raw_yaw = atan2f(mag_result[0], mag_result[1]) * 180.0 / M_PI + 180.0f;
+
+//    printf("------Madgwick-----\r\n");
+//    printf("Roll: %.1f, ", roll);
+//    printf("Pitch: %.1f, ", pitch);
+////    printf("Raw Yaw: %.1f, ", raw_yaw);
+//    printf("Yaw: %.1f\n", yaw);
+
+    // Roll
+    float tmp = 0.0f;
+
+    tmp = ekf_Filter.getRoll_rad() * 180.0f / M_PI + 180.0f;
+
+    if ( tmp > 180.0f )
+      tmp -= 360.0f;
+
+    roll = tmp;
+
+    // Pitch
+    pitch = ekf_Filter.getPitch_rad() * 180.0f / M_PI;
+
+    // Yaw
+    yaw = ekf_Filter.getYaw_rad() * 180.0f / M_PI;
+
+//    printf("------EKF-----\r\n");
+    printf("Roll: %.1f, ", roll);
+    printf("Pitch: %.1f, ", pitch);
+    printf("Yaw: %.1f\n", yaw);
+
+    lastTick = now;
+#endif
+    HAL_Delay(5);
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_8);
+
   }
   else
   {
     HAL_Delay(500);
   }
+
 }
 
-// Below here are some helper functions to print the data nicely!
 
-void printPaddedInt16b(int16_t val)
+void inverse3x3(float matrix[3][3], float result[3][3])
 {
-  if (val > 0)
-  {
-    printf(" ");
-    if (val < 10000)
-    {
-      printf("0");
+    float det = matrix[0][0] * (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1]) -
+                matrix[0][1] * (matrix[1][0] * matrix[2][2] - matrix[1][2] * matrix[2][0]) +
+                matrix[0][2] * (matrix[1][0] * matrix[2][1] - matrix[1][1] * matrix[2][0]);
+
+    if (det == 0) {
+        printf("Matrix is singular and cannot be inverted.\n");
+        return;
     }
-    if (val < 1000)
-    {
-      printf("0");
-    }
-    if (val < 100)
-    {
-      printf("0");
-    }
-    if (val < 10)
-    {
-      printf("0");
-    }
-  }
-  else
-  {
-    printf("-");
-    if (abs(val) < 10000)
-    {
-      printf("0");
-    }
-    if (abs(val) < 1000)
-    {
-      printf("0");
-    }
-    if (abs(val) < 100)
-    {
-      printf("0");
-    }
-    if (abs(val) < 10)
-    {
-      printf("0");
-    }
-  }
-  printf("%d", abs(val));
+
+    float invDet = 1.0 / det;
+
+    result[0][0] = (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1]) * invDet;
+    result[0][1] = (matrix[0][2] * matrix[2][1] - matrix[0][1] * matrix[2][2]) * invDet;
+    result[0][2] = (matrix[0][1] * matrix[1][2] - matrix[0][2] * matrix[1][1]) * invDet;
+    result[1][0] = (matrix[1][2] * matrix[2][0] - matrix[1][0] * matrix[2][2]) * invDet;
+    result[1][1] = (matrix[0][0] * matrix[2][2] - matrix[0][2] * matrix[2][0]) * invDet;
+    result[1][2] = (matrix[0][2] * matrix[1][0] - matrix[0][0] * matrix[1][2]) * invDet;
+    result[2][0] = (matrix[1][0] * matrix[2][1] - matrix[1][1] * matrix[2][0]) * invDet;
+    result[2][1] = (matrix[0][1] * matrix[2][0] - matrix[0][0] * matrix[2][1]) * invDet;
+    result[2][2] = (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]) * invDet;
 }
 
-void printRawAGMT(ICM_20948_AGMT_t agmt)
-{
-  printf("RAW. Acc [ ");
-  printPaddedInt16b(agmt.acc.axes.x);
-  printf(", ");
-  printPaddedInt16b(agmt.acc.axes.y);
-  printf(", ");
-  printPaddedInt16b(agmt.acc.axes.z);
-  printf(" ], Gyr [ ");
-  printPaddedInt16b(agmt.gyr.axes.x);
-  printf(", ");
-  printPaddedInt16b(agmt.gyr.axes.y);
-  printf(", ");
-  printPaddedInt16b(agmt.gyr.axes.z);
-  printf(" ], Mag [ ");
-  printPaddedInt16b(agmt.mag.axes.x);
-  printf(", ");
-  printPaddedInt16b(agmt.mag.axes.y);
-  printf(", ");
-  printPaddedInt16b(agmt.mag.axes.z);
-  printf(" ], Tmp [ ");
-  printPaddedInt16b(agmt.tmp.val);
-  printf(" ]");
-  printf("\n");
-}
-
-void printFormattedFloat(float val, uint8_t leading, uint8_t decimals)
-{
-  float aval = abs(val);
-  if (val < 0)
-  {
-    printf("-");
-  }
-  else
-  {
-    printf(" ");
-  }
-  for (uint8_t indi = 0; indi < leading; indi++)
-  {
-    uint32_t tenpow = 0;
-    if (indi < (leading - 1))
-    {
-      tenpow = 1;
-    }
-    for (uint8_t c = 0; c < (leading - 1 - indi); c++)
-    {
-      tenpow *= 10;
-    }
-    if (aval < tenpow)
-    {
-      printf("0");
-    }
-    else
-    {
-      break;
-    }
-  }
-  if ( val < 0 )
-  {
-    printf("%f%d",-val, decimals);
-  }
-  else
-  {
-    printf("%f%d",val, decimals);
-  }
-}
-
-void printScaledAGMT(ICM_20948_I2C *sensor)
-{
-  printf("Scaled. Acc (g) [ ");
-  printFormattedFloat(sensor->accX()/1000.0f, 5, 2);
-  printf(", ");
-  printFormattedFloat(sensor->accY()/1000.0f, 5, 2);
-  printf(", ");
-  printFormattedFloat(sensor->accZ()/1000.0f, 5, 2);
-  printf(" ], Gyr (rad/s) [ ");
-  printFormattedFloat(sensor->gyrX()*0.017453f, 5, 2);
-  printf(", ");
-  printFormattedFloat(sensor->gyrY()*0.017453f, 5, 2);
-  printf(", ");
-  printFormattedFloat(sensor->gyrZ()*0.017453f, 5, 2);
-  printf(" ], Mag (uT) [ ");
-  printFormattedFloat(sensor->magX(), 5, 2);
-  printf(", ");
-  printFormattedFloat(sensor->magY(), 5, 2);
-  printf(", ");
-  printFormattedFloat(sensor->magZ(), 5, 2);
-  printf(" ], Tmp (C) [ ");
-  printFormattedFloat(sensor->temp(), 5, 2);
-  printf(" ]");
-  printf("\n");
-}

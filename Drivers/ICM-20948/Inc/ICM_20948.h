@@ -57,16 +57,16 @@ public:
 #endif
 
 //  void disableDebugging(void); //Turn off debug statements
-//
+
 //  void debugPrintStatus(ICM_20948_Status_e stat);
-//
-//  // gfvalvo's flash string helper code: https://forum.arduino.cc/index.php?topic=533118.msg3634809#msg3634809
+
+  // gfvalvo's flash string helper code: https://forum.arduino.cc/index.php?topic=533118.msg3634809#msg3634809
 //  void debugPrint(const char *);
 //  void debugPrint(const __FlashStringHelper *);
 //  void debugPrintln(const char *);
 //  void debugPrintln(const __FlashStringHelper *);
 //  void doDebugPrint(char (*)(const char *), const char *, bool newLine = false);
-//
+
 //  void debugPrintf(int i);
 //  void debugPrintf(float f);
 
@@ -128,6 +128,7 @@ public:
   ICM_20948_Status_e intEnableOverflowFIFO(uint8_t bm_enable);
   ICM_20948_Status_e intEnableWatermarkFIFO(uint8_t bm_enable);
 
+  ICM_20948_Status_e WOMLogic(uint8_t enable, uint8_t mode);
   ICM_20948_Status_e WOMThreshold(uint8_t threshold);
 
   // Interface Options
@@ -171,6 +172,28 @@ public:
 
   //DMP
 
+  //Gyro Bias
+  ICM_20948_Status_e setBiasGyroX(int32_t newValue);
+  ICM_20948_Status_e setBiasGyroY(int32_t newValue);
+  ICM_20948_Status_e setBiasGyroZ(int32_t newValue);
+  ICM_20948_Status_e getBiasGyroX(int32_t* bias);
+  ICM_20948_Status_e getBiasGyroY(int32_t* bias);
+  ICM_20948_Status_e getBiasGyroZ(int32_t* bias);
+  //Accel Bias
+  ICM_20948_Status_e setBiasAccelX(int32_t newValue);
+  ICM_20948_Status_e setBiasAccelY(int32_t newValue);
+  ICM_20948_Status_e setBiasAccelZ(int32_t newValue);
+  ICM_20948_Status_e getBiasAccelX(int32_t* bias);
+  ICM_20948_Status_e getBiasAccelY(int32_t* bias);
+  ICM_20948_Status_e getBiasAccelZ(int32_t* bias);
+  //CPass Bias
+  ICM_20948_Status_e setBiasCPassX(int32_t newValue);
+  ICM_20948_Status_e setBiasCPassY(int32_t newValue);
+  ICM_20948_Status_e setBiasCPassZ(int32_t newValue);
+  ICM_20948_Status_e getBiasCPassX(int32_t* bias);
+  ICM_20948_Status_e getBiasCPassY(int32_t* bias);
+  ICM_20948_Status_e getBiasCPassZ(int32_t* bias);
+
   // Done:
   //  Configure DMP start address through PRGM_STRT_ADDRH/PRGM_STRT_ADDRL
   //  Load Firmware
@@ -213,58 +236,18 @@ public:
   ICM_20948_Status_e initializeDMP(void) __attribute__((weak)); // Combine all of the DMP start-up code in one place. Can be overwritten if required
 };
 
-//// I2C
-//
-//// Forward declarations of TwoWire and Wire for board/variant combinations that don't have a default 'SPI'
-////class TwoWire; // Commented by PaulZC 21/2/8 - this was causing compilation to fail on the Arduino NANO 33 BLE
-////extern TwoWire Wire; // Commented by PaulZC 21/2/8 - this was causing compilation to fail on the Arduino NANO 33 BLE
-//
-//class ICM_20948_I2C : public ICM_20948
-//{
-//private:
-//protected:
-//public:
-//  TwoWire *_i2c;
-//  uint8_t _addr;
-//  uint8_t _ad0;
-//  bool _ad0val;
-//  ICM_20948_Serif_t _serif;
-//
-//  ICM_20948_I2C(); // Constructor
-//
-//  virtual ICM_20948_Status_e begin(TwoWire &wirePort = Wire, bool ad0val = true, uint8_t ad0pin = ICM_20948_ARD_UNUSED_PIN);
-//};
-//
-//// SPI
-//#define ICM_20948_SPI_DEFAULT_FREQ 4000000
-//#define ICM_20948_SPI_DEFAULT_ORDER MSBFIRST
-//#define ICM_20948_SPI_DEFAULT_MODE SPI_MODE0
-//
-//// Forward declarations of SPIClass and SPI for board/variant combinations that don't have a default 'SPI'
-////class SPIClass; // Commented by PaulZC 21/2/8 - this was causing compilation to fail on the Arduino NANO 33 BLE
-////extern SPIClass SPI; // Commented by PaulZC 21/2/8 - this was causing compilation to fail on the Arduino NANO 33 BLE
-//
-//class ICM_20948_SPI : public ICM_20948
-//{
-//private:
-//protected:
-//public:
-//  SPIClass *_spi;
-//  SPISettings _spisettings;
-//  uint8_t _cs;
-//  ICM_20948_Serif_t _serif;
-//
-//  ICM_20948_SPI(); // Constructor
-//
-//  ICM_20948_Status_e begin(uint8_t csPin, SPIClass &spiPort = SPI, uint32_t SPIFreq = ICM_20948_SPI_DEFAULT_FREQ);
-//};
+// I2C
 
+// Forward declarations of TwoWire and Wire for board/variant combinations that don't have a default 'SPI'
+//class TwoWire; // Commented by PaulZC 21/2/8 - this was causing compilation to fail on the Arduino NANO 33 BLE
+//extern TwoWire Wire; // Commented by PaulZC 21/2/8 - this was causing compilation to fail on the Arduino NANO 33 BLE
+
+#if 1
 class ICM_20948_I2C : public ICM_20948
 {
 private:
 protected:
 public:
-//  TwoWire *_i2c;
   uint8_t _addr;
   uint8_t _ad0;
   bool _ad0val;
@@ -272,7 +255,50 @@ public:
 
   ICM_20948_I2C(); // Constructor
 
-  virtual ICM_20948_Status_e begin();
+  virtual ICM_20948_Status_e begin(bool ad0val = true, uint8_t ad0pin = ICM_20948_ARD_UNUSED_PIN);
 };
+#else
+class ICM_20948_I2C : public ICM_20948
+{
+private:
+protected:
+public:
+  uint8_t _addr;
+  uint8_t _ad0;
+  bool _ad0val;
+  ICM_20948_Serif_t _serif;
+
+  ICM_20948_I2C(); // Constructor
+
+  virtual ICM_20948_Status_e begin(TwoWire &wirePort = Wire, bool ad0val = true, uint8_t ad0pin = ICM_20948_ARD_UNUSED_PIN);
+};
+#endif
+
+// SPI
+#if 0
+#define ICM_20948_SPI_DEFAULT_FREQ 4000000
+#define ICM_20948_SPI_DEFAULT_ORDER MSBFIRST
+#define ICM_20948_SPI_DEFAULT_MODE SPI_MODE0
+#endif
+
+// Forward declarations of SPIClass and SPI for board/variant combinations that don't have a default 'SPI'
+//class SPIClass; // Commented by PaulZC 21/2/8 - this was causing compilation to fail on the Arduino NANO 33 BLE
+//extern SPIClass SPI; // Commented by PaulZC 21/2/8 - this was causing compilation to fail on the Arduino NANO 33 BLE
+#if 0
+class ICM_20948_SPI : public ICM_20948
+{
+private:
+protected:
+public:
+  SPIClass *_spi;
+  SPISettings _spisettings;
+  uint8_t _cs;
+  ICM_20948_Serif_t _serif;
+
+  ICM_20948_SPI(); // Constructor
+
+  ICM_20948_Status_e begin(uint8_t csPin, SPIClass &spiPort = SPI, uint32_t SPIFreq = ICM_20948_SPI_DEFAULT_FREQ);
+};
+#endif
 
 #endif /* _ICM_20948_H_ */

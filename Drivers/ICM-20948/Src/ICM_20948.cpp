@@ -1,9 +1,3 @@
-/*
- * ICM_20948.cpp
- *
- *  Created on: 2024年8月15日
- *      Author: 20210113
- */
 #include "ICM_20948.h"
 
 #include "ICM_20948_REGISTERS.h"
@@ -23,128 +17,130 @@ ICM_20948::ICM_20948()
   status = ICM_20948_init_struct(&_device);
 }
 
-//void ICM_20948::enableDebugging(Stream &debugPort)
-//{
-//  _debugSerial = &debugPort; //Grab which port the user wants us to use for debugging
-//  _printDebug = true;        //Should we print the commands we send? Good for debugging
-//}
-//void ICM_20948::disableDebugging(void)
-//{
-//  _printDebug = false; //Turn off extra print statements
-//}
-//
-//// Debug Printing: based on gfvalvo's flash string helper code:
-//// https://forum.arduino.cc/index.php?topic=533118.msg3634809#msg3634809
-//
-//void ICM_20948::debugPrint(const char *line)
-//{
-//  doDebugPrint([](const char *ptr) { return *ptr; }, line);
-//}
-//
-//void ICM_20948::debugPrint(const __FlashStringHelper *line)
-//{
-//  doDebugPrint([](const char *ptr) { return (char)pgm_read_byte_near(ptr); },
-//               (const char *)line);
-//}
-//
-//void ICM_20948::debugPrintln(const char *line)
-//{
-//  doDebugPrint([](const char *ptr) { return *ptr; }, line, true);
-//}
-//
-//void ICM_20948::debugPrintln(const __FlashStringHelper *line)
-//{
-//  doDebugPrint([](const char *ptr) { return (char)pgm_read_byte_near(ptr); },
-//               (const char *)line, true);
-//}
-//
-//void ICM_20948::doDebugPrint(char (*funct)(const char *), const char *string, bool newLine)
-//{
-//  if (_printDebug == false)
-//    return; // Bail if debugging is not enabled
-//
-//  char ch;
-//
-//  while ((ch = funct(string++)))
-//  {
-//    _debugSerial->print(ch);
-//  }
-//
-//  if (newLine)
-//  {
-//    _debugSerial->println();
-//  }
-//}
-//
-//void ICM_20948::debugPrintf(int i)
-//{
-//  if (_printDebug == true)
-//    _debugSerial->print(i);
-//}
-//
-//void ICM_20948::debugPrintf(float f)
-//{
-//  if (_printDebug == true)
-//    _debugSerial->print(f);
-//}
-//
-//void ICM_20948::debugPrintStatus(ICM_20948_Status_e stat)
-//{
-//  switch (stat)
-//  {
-//  case ICM_20948_Stat_Ok:
-//    debugPrint(F("All is well."));
-//    break;
-//  case ICM_20948_Stat_Err:
-//    debugPrint(F("General Error"));
-//    break;
-//  case ICM_20948_Stat_NotImpl:
-//    debugPrint(F("Not Implemented"));
-//    break;
-//  case ICM_20948_Stat_ParamErr:
-//    debugPrint(F("Parameter Error"));
-//    break;
-//  case ICM_20948_Stat_WrongID:
-//    debugPrint(F("Wrong ID"));
-//    break;
-//  case ICM_20948_Stat_InvalSensor:
-//    debugPrint(F("Invalid Sensor"));
-//    break;
-//  case ICM_20948_Stat_NoData:
-//    debugPrint(F("Data Underflow"));
-//    break;
-//  case ICM_20948_Stat_SensorNotSupported:
-//    debugPrint(F("Sensor Not Supported"));
-//    break;
-//  case ICM_20948_Stat_DMPNotSupported:
-//    debugPrint(F("DMP Firmware Not Supported. Is #define ICM_20948_USE_DMP commented in util/ICM_20948_C.h?"));
-//    break;
-//  case ICM_20948_Stat_DMPVerifyFail:
-//    debugPrint(F("DMP Firmware Verification Failed"));
-//    break;
-//  case ICM_20948_Stat_FIFONoDataAvail:
-//    debugPrint(F("No FIFO Data Available"));
-//    break;
-//  case ICM_20948_Stat_FIFOIncompleteData:
-//    debugPrint(F("DMP data in FIFO was incomplete"));
-//    break;
-//  case ICM_20948_Stat_FIFOMoreDataAvail:
-//    debugPrint(F("More FIFO Data Available"));
-//    break;
-//  case ICM_20948_Stat_UnrecognisedDMPHeader:
-//    debugPrint(F("Unrecognised DMP Header"));
-//    break;
-//  case ICM_20948_Stat_UnrecognisedDMPHeader2:
-//    debugPrint(F("Unrecognised DMP Header2"));
-//    break;
-//  case ICM_20948_Stat_InvalDMPRegister:
-//    debugPrint(F("Invalid DMP Register"));
-//    break;
-//  default:
-//    debugPrint(F("Unknown Status"));
-//    break;
-//  }
-//}
+#if 0
+void ICM_20948::enableDebugging(Stream &debugPort)
+{
+  _debugSerial = &debugPort; //Grab which port the user wants us to use for debugging
+  _printDebug = true;        //Should we print the commands we send? Good for debugging
+}
+void ICM_20948::disableDebugging(void)
+{
+  _printDebug = false; //Turn off extra print statements
+}
+
+// Debug Printing: based on gfvalvo's flash string helper code:
+// https://forum.arduino.cc/index.php?topic=533118.msg3634809#msg3634809
+
+void ICM_20948::debugPrint(const char *line)
+{
+  doDebugPrint([](const char *ptr) { return *ptr; }, line);
+}
+
+void ICM_20948::debugPrint(const __FlashStringHelper *line)
+{
+  doDebugPrint([](const char *ptr) { return (char)pgm_read_byte_near(ptr); },
+               (const char *)line);
+}
+
+void ICM_20948::debugPrintln(const char *line)
+{
+  doDebugPrint([](const char *ptr) { return *ptr; }, line, true);
+}
+
+void ICM_20948::debugPrintln(const __FlashStringHelper *line)
+{
+  doDebugPrint([](const char *ptr) { return (char)pgm_read_byte_near(ptr); },
+               (const char *)line, true);
+}
+
+void ICM_20948::doDebugPrint(char (*funct)(const char *), const char *string, bool newLine)
+{
+  if (_printDebug == false)
+    return; // Bail if debugging is not enabled
+
+  char ch;
+
+  while ((ch = funct(string++)))
+  {
+    _debugSerial->print(ch);
+  }
+
+  if (newLine)
+  {
+    _debugSerial->println();
+  }
+}
+
+void ICM_20948::debugPrintf(int i)
+{
+  if (_printDebug == true)
+    _debugSerial->print(i);
+}
+
+void ICM_20948::debugPrintf(float f)
+{
+  if (_printDebug == true)
+    _debugSerial->print(f);
+}
+
+void ICM_20948::debugPrintStatus(ICM_20948_Status_e stat)
+{
+  switch (stat)
+  {
+  case ICM_20948_Stat_Ok:
+    debugPrint(F("All is well."));
+    break;
+  case ICM_20948_Stat_Err:
+    debugPrint(F("General Error"));
+    break;
+  case ICM_20948_Stat_NotImpl:
+    debugPrint(F("Not Implemented"));
+    break;
+  case ICM_20948_Stat_ParamErr:
+    debugPrint(F("Parameter Error"));
+    break;
+  case ICM_20948_Stat_WrongID:
+    debugPrint(F("Wrong ID"));
+    break;
+  case ICM_20948_Stat_InvalSensor:
+    debugPrint(F("Invalid Sensor"));
+    break;
+  case ICM_20948_Stat_NoData:
+    debugPrint(F("Data Underflow"));
+    break;
+  case ICM_20948_Stat_SensorNotSupported:
+    debugPrint(F("Sensor Not Supported"));
+    break;
+  case ICM_20948_Stat_DMPNotSupported:
+    debugPrint(F("DMP Firmware Not Supported. Is #define ICM_20948_USE_DMP commented in util/ICM_20948_C.h?"));
+    break;
+  case ICM_20948_Stat_DMPVerifyFail:
+    debugPrint(F("DMP Firmware Verification Failed"));
+    break;
+  case ICM_20948_Stat_FIFONoDataAvail:
+    debugPrint(F("No FIFO Data Available"));
+    break;
+  case ICM_20948_Stat_FIFOIncompleteData:
+    debugPrint(F("DMP data in FIFO was incomplete"));
+    break;
+  case ICM_20948_Stat_FIFOMoreDataAvail:
+    debugPrint(F("More FIFO Data Available"));
+    break;
+  case ICM_20948_Stat_UnrecognisedDMPHeader:
+    debugPrint(F("Unrecognised DMP Header"));
+    break;
+  case ICM_20948_Stat_UnrecognisedDMPHeader2:
+    debugPrint(F("Unrecognised DMP Header2"));
+    break;
+  case ICM_20948_Stat_InvalDMPRegister:
+    debugPrint(F("Invalid DMP Register"));
+    break;
+  default:
+    debugPrint(F("Unknown Status"));
+    break;
+  }
+}
+#endif
 
 ICM_20948_AGMT_t ICM_20948::getAGMT(void)
 {
@@ -245,6 +241,295 @@ float ICM_20948::getGyrDPS(int16_t axis_val)
     return 0;
     break;
   }
+}
+
+//Gyro Bias
+ICM_20948_Status_e ICM_20948::setBiasGyroX( int32_t newValue)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char gyro_bias_reg[4];
+    gyro_bias_reg[0] = (unsigned char)(newValue >> 24);
+    gyro_bias_reg[1] = (unsigned char)(newValue >> 16);
+    gyro_bias_reg[2] = (unsigned char)(newValue >> 8);
+    gyro_bias_reg[3] = (unsigned char)(newValue & 0xff);
+    status = inv_icm20948_write_mems(&_device, GYRO_BIAS_X, 4, (const unsigned char*)&gyro_bias_reg);
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::setBiasGyroY( int32_t newValue)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char gyro_bias_reg[4];
+    gyro_bias_reg[0] = (unsigned char)(newValue >> 24);
+    gyro_bias_reg[1] = (unsigned char)(newValue >> 16);
+    gyro_bias_reg[2] = (unsigned char)(newValue >> 8);
+    gyro_bias_reg[3] = (unsigned char)(newValue & 0xff);
+    status = inv_icm20948_write_mems(&_device, GYRO_BIAS_Y, 4, (const unsigned char*)&gyro_bias_reg);
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::setBiasGyroZ( int32_t newValue)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char gyro_bias_reg[4];
+    gyro_bias_reg[0] = (unsigned char)(newValue >> 24);
+    gyro_bias_reg[1] = (unsigned char)(newValue >> 16);
+    gyro_bias_reg[2] = (unsigned char)(newValue >> 8);
+    gyro_bias_reg[3] = (unsigned char)(newValue & 0xff);
+    status = inv_icm20948_write_mems(&_device, GYRO_BIAS_Z, 4, (const unsigned char*)&gyro_bias_reg);
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::getBiasGyroX( int32_t* bias)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char bias_data[4] = { 0 };
+    status = inv_icm20948_read_mems(&_device, GYRO_BIAS_X, 4, bias_data);
+    union {
+      int32_t signed32;
+      uint32_t unsigned32;
+    } signedUnsigned32;
+    signedUnsigned32.unsigned32 = (((uint32_t)bias_data[0]) << 24) | (((uint32_t)bias_data[1]) << 16) | (((uint32_t)bias_data[2]) << 8) | (bias_data[3]);
+    *bias = signedUnsigned32.signed32; // Convert from unsigned to signed with no cast ambiguity
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::getBiasGyroY( int32_t* bias)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char bias_data[4] = { 0 };
+    status = inv_icm20948_read_mems(&_device, GYRO_BIAS_Y, 4, bias_data);
+    union {
+      int32_t signed32;
+      uint32_t unsigned32;
+    } signedUnsigned32;
+    signedUnsigned32.unsigned32 = (((uint32_t)bias_data[0]) << 24) | (((uint32_t)bias_data[1]) << 16) | (((uint32_t)bias_data[2]) << 8) | (bias_data[3]);
+    *bias = signedUnsigned32.signed32; // Convert from unsigned to signed with no cast ambiguity
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::getBiasGyroZ( int32_t* bias)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char bias_data[4] = { 0 };
+    status = inv_icm20948_read_mems(&_device, GYRO_BIAS_Z, 4, bias_data);
+    union {
+      int32_t signed32;
+      uint32_t unsigned32;
+    } signedUnsigned32;
+    signedUnsigned32.unsigned32 = (((uint32_t)bias_data[0]) << 24) | (((uint32_t)bias_data[1]) << 16) | (((uint32_t)bias_data[2]) << 8) | (bias_data[3]);
+    *bias = signedUnsigned32.signed32; // Convert from unsigned to signed with no cast ambiguity
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+//Accel Bias
+ICM_20948_Status_e ICM_20948::setBiasAccelX( int32_t newValue)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char accel_bias_reg[4];
+    accel_bias_reg[0] = (unsigned char)(newValue >> 24);
+    accel_bias_reg[1] = (unsigned char)(newValue >> 16);
+    accel_bias_reg[2] = (unsigned char)(newValue >> 8);
+    accel_bias_reg[3] = (unsigned char)(newValue & 0xff);
+    status = inv_icm20948_write_mems(&_device, ACCEL_BIAS_X, 4, (const unsigned char*)&accel_bias_reg);
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::setBiasAccelY( int32_t newValue)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char accel_bias_reg[4];
+    accel_bias_reg[0] = (unsigned char)(newValue >> 24);
+    accel_bias_reg[1] = (unsigned char)(newValue >> 16);
+    accel_bias_reg[2] = (unsigned char)(newValue >> 8);
+    accel_bias_reg[3] = (unsigned char)(newValue & 0xff);
+    status = inv_icm20948_write_mems(&_device, ACCEL_BIAS_Y, 4, (const unsigned char*)&accel_bias_reg);
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::setBiasAccelZ( int32_t newValue)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char accel_bias_reg[4];
+    accel_bias_reg[0] = (unsigned char)(newValue >> 24);
+    accel_bias_reg[1] = (unsigned char)(newValue >> 16);
+    accel_bias_reg[2] = (unsigned char)(newValue >> 8);
+    accel_bias_reg[3] = (unsigned char)(newValue & 0xff);
+    status = inv_icm20948_write_mems(&_device, ACCEL_BIAS_Z, 4, (const unsigned char*)&accel_bias_reg);
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::getBiasAccelX( int32_t* bias)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char bias_data[4] = { 0 };
+    status = inv_icm20948_read_mems(&_device, ACCEL_BIAS_X, 4, bias_data);
+    union {
+      int32_t signed32;
+      uint32_t unsigned32;
+    } signedUnsigned32;
+    signedUnsigned32.unsigned32 = (((uint32_t)bias_data[0]) << 24) | (((uint32_t)bias_data[1]) << 16) | (((uint32_t)bias_data[2]) << 8) | (bias_data[3]);
+    *bias = signedUnsigned32.signed32; // Convert from unsigned to signed with no cast ambiguity
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::getBiasAccelY( int32_t* bias)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char bias_data[4] = { 0 };
+    status = inv_icm20948_read_mems(&_device, ACCEL_BIAS_Y, 4, bias_data);
+    union {
+      int32_t signed32;
+      uint32_t unsigned32;
+    } signedUnsigned32;
+    signedUnsigned32.unsigned32 = (((uint32_t)bias_data[0]) << 24) | (((uint32_t)bias_data[1]) << 16) | (((uint32_t)bias_data[2]) << 8) | (bias_data[3]);
+    *bias = signedUnsigned32.signed32; // Convert from unsigned to signed with no cast ambiguity
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::getBiasAccelZ( int32_t* bias)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char bias_data[4] = { 0 };
+    status = inv_icm20948_read_mems(&_device, ACCEL_BIAS_Z, 4, bias_data);
+    union {
+      int32_t signed32;
+      uint32_t unsigned32;
+    } signedUnsigned32;
+    signedUnsigned32.unsigned32 = (((uint32_t)bias_data[0]) << 24) | (((uint32_t)bias_data[1]) << 16) | (((uint32_t)bias_data[2]) << 8) | (bias_data[3]);
+    *bias = signedUnsigned32.signed32; // Convert from unsigned to signed with no cast ambiguity
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+//CPass Bias
+ICM_20948_Status_e ICM_20948::setBiasCPassX( int32_t newValue)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char cpass_bias_reg[4];
+    cpass_bias_reg[0] = (unsigned char)(newValue >> 24);
+    cpass_bias_reg[1] = (unsigned char)(newValue >> 16);
+    cpass_bias_reg[2] = (unsigned char)(newValue >> 8);
+    cpass_bias_reg[3] = (unsigned char)(newValue & 0xff);
+    status = inv_icm20948_write_mems(&_device, CPASS_BIAS_X, 4, (const unsigned char*)&cpass_bias_reg);
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::setBiasCPassY( int32_t newValue)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char cpass_bias_reg[4];
+    cpass_bias_reg[0] = (unsigned char)(newValue >> 24);
+    cpass_bias_reg[1] = (unsigned char)(newValue >> 16);
+    cpass_bias_reg[2] = (unsigned char)(newValue >> 8);
+    cpass_bias_reg[3] = (unsigned char)(newValue & 0xff);
+    status = inv_icm20948_write_mems(&_device, CPASS_BIAS_Y, 4, (const unsigned char*)&cpass_bias_reg);
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::setBiasCPassZ( int32_t newValue)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char cpass_bias_reg[4];
+    cpass_bias_reg[0] = (unsigned char)(newValue >> 24);
+    cpass_bias_reg[1] = (unsigned char)(newValue >> 16);
+    cpass_bias_reg[2] = (unsigned char)(newValue >> 8);
+    cpass_bias_reg[3] = (unsigned char)(newValue & 0xff);
+    status = inv_icm20948_write_mems(&_device, CPASS_BIAS_Z, 4, (const unsigned char*)&cpass_bias_reg);
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::getBiasCPassX( int32_t* bias)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char bias_data[4] = { 0 };
+    status = inv_icm20948_read_mems(&_device, CPASS_BIAS_X, 4, bias_data);
+    union {
+      int32_t signed32;
+      uint32_t unsigned32;
+    } signedUnsigned32;
+    signedUnsigned32.unsigned32 = (((uint32_t)bias_data[0]) << 24) | (((uint32_t)bias_data[1]) << 16) | (((uint32_t)bias_data[2]) << 8) | (bias_data[3]);
+    *bias = signedUnsigned32.signed32; // Convert from unsigned to signed with no cast ambiguity
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::getBiasCPassY( int32_t* bias)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char bias_data[4] = { 0 };
+    status = inv_icm20948_read_mems(&_device, CPASS_BIAS_Y, 4, bias_data);
+    union {
+      int32_t signed32;
+      uint32_t unsigned32;
+    } signedUnsigned32;
+    signedUnsigned32.unsigned32 = (((uint32_t)bias_data[0]) << 24) | (((uint32_t)bias_data[1]) << 16) | (((uint32_t)bias_data[2]) << 8) | (bias_data[3]);
+    *bias = signedUnsigned32.signed32; // Convert from unsigned to signed with no cast ambiguity
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
+}
+
+ICM_20948_Status_e ICM_20948::getBiasCPassZ( int32_t* bias)
+{
+  if (_device._dmp_firmware_available == true) // Is DMP supported?
+  {
+    unsigned char bias_data[4] = { 0 };
+    status = inv_icm20948_read_mems(&_device, CPASS_BIAS_Z, 4, bias_data);
+    union {
+      int32_t signed32;
+      uint32_t unsigned32;
+    } signedUnsigned32;
+    signedUnsigned32.unsigned32 = (((uint32_t)bias_data[0]) << 24) | (((uint32_t)bias_data[1]) << 16) | (((uint32_t)bias_data[2]) << 8) | (bias_data[3]);
+    *bias = signedUnsigned32.signed32; // Convert from unsigned to signed with no cast ambiguity
+    return status;
+  }
+  return ICM_20948_Stat_DMPNotSupported;
 }
 
 float ICM_20948::temp(void)
@@ -362,9 +647,11 @@ ICM_20948_Status_e ICM_20948::checkID(void)
   status = ICM_20948_check_id(&_device);
   if (status != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::checkID: ICM_20948_check_id returned: "));
-//    debugPrintStatus(status);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::checkID: ICM_20948_check_id returned: "));
+    debugPrintStatus(status);
+    debugPrintln(F(""));
+#endif
   }
   return status;
 }
@@ -393,9 +680,11 @@ bool ICM_20948::isConnected(void)
   {
     return true;
   }
-//  debugPrint(F("ICM_20948::isConnected: checkID returned: "));
-//  debugPrintStatus(status);
-//  debugPrintln(F(""));
+#if 0
+  debugPrint(F("ICM_20948::isConnected: checkID returned: "));
+  debugPrintStatus(status);
+  debugPrintln(F(""));
+#endif
   return false;
 }
 
@@ -736,6 +1025,30 @@ ICM_20948_Status_e ICM_20948::intEnableWatermarkFIFO(uint8_t bm_enable)
   return status;
 }
 
+ICM_20948_Status_e ICM_20948::WOMLogic(uint8_t enable, uint8_t mode)
+{
+  ICM_20948_ACCEL_INTEL_CTRL_t ctrl;                   // storage
+  status = ICM_20948_wom_logic(&_device, NULL, &ctrl); // read phase
+  if (status != ICM_20948_Stat_Ok)
+  {
+    return status;
+  }
+  ctrl.ACCEL_INTEL_EN = enable;     // enable the WOM logic
+  ctrl.ACCEL_INTEL_MODE_INT = mode; // config mode
+
+  status = ICM_20948_wom_logic(&_device, &ctrl, &ctrl); // write new config
+  if (status != ICM_20948_Stat_Ok)
+  {
+    return status;
+  }
+  if (ctrl.ACCEL_INTEL_MODE_INT != mode)
+  {
+    status = ICM_20948_Stat_Err;
+    return status;
+  }
+  return status;
+}
+
 ICM_20948_Status_e ICM_20948::WOMThreshold(uint8_t threshold)
 {
   ICM_20948_ACCEL_WOM_THR_t thr;                          // storage
@@ -814,9 +1127,11 @@ uint8_t ICM_20948::i2cMasterSingleR(uint8_t addr, uint8_t reg)
   status = ICM_20948_i2c_master_single_r(&_device, addr, reg, &data);
   if (status != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::i2cMasterSingleR: ICM_20948_i2c_master_single_r returned: "));
-//    debugPrintStatus(status);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::i2cMasterSingleR: ICM_20948_i2c_master_single_r returned: "));
+    debugPrintStatus(status);
+    debugPrintln(F(""));
+#endif
   }
   return data;
 }
@@ -828,9 +1143,11 @@ ICM_20948_Status_e ICM_20948::startupDefault(bool minimal)
   retval = checkID();
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: checkID returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: checkID returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -838,9 +1155,11 @@ ICM_20948_Status_e ICM_20948::startupDefault(bool minimal)
   retval = swReset();
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: swReset returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: swReset returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -849,9 +1168,11 @@ ICM_20948_Status_e ICM_20948::startupDefault(bool minimal)
   retval = sleep(false);
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: sleep returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: sleep returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -859,9 +1180,11 @@ ICM_20948_Status_e ICM_20948::startupDefault(bool minimal)
   retval = lowPower(false);
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: lowPower returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: lowPower returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -869,25 +1192,31 @@ ICM_20948_Status_e ICM_20948::startupDefault(bool minimal)
   retval = startupMagnetometer(minimal); // Pass the minimal startup flag to startupMagnetometer
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: startupMagnetometer returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: startupMagnetometer returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
 
   if (minimal) // Return now if minimal is true
   {
-//    debugPrintln(F("ICM_20948::startupDefault: minimal startup complete!"));
+#if 0
+    debugPrintln(F("ICM_20948::startupDefault: minimal startup complete!"));
+#endif
     return status;
   }
 
   retval = setSampleMode((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), ICM_20948_Sample_Mode_Continuous); // options: ICM_20948_Sample_Mode_Continuous or ICM_20948_Sample_Mode_Cycled
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: setSampleMode returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: setSampleMode returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   } // sensors: 	ICM_20948_Internal_Acc, ICM_20948_Internal_Gyr, ICM_20948_Internal_Mst
@@ -898,9 +1227,11 @@ ICM_20948_Status_e ICM_20948::startupDefault(bool minimal)
   retval = setFullScale((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), FSS);
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: setFullScale returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: setFullScale returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -911,9 +1242,11 @@ ICM_20948_Status_e ICM_20948::startupDefault(bool minimal)
   retval = setDLPFcfg((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), dlpcfg);
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: setDLPFcfg returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: setDLPFcfg returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -921,9 +1254,11 @@ ICM_20948_Status_e ICM_20948::startupDefault(bool minimal)
   retval = enableDLPF(ICM_20948_Internal_Acc, false);
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: enableDLPF (Acc) returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: enableDLPF (Acc) returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -931,9 +1266,11 @@ ICM_20948_Status_e ICM_20948::startupDefault(bool minimal)
   retval = enableDLPF(ICM_20948_Internal_Gyr, false);
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupDefault: enableDLPF (Gyr) returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupDefault: enableDLPF (Gyr) returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -1053,17 +1390,19 @@ ICM_20948_Status_e ICM_20948::enableDMPSensor(enum inv_icm20948_sensor sensor, b
   if (_device._dmp_firmware_available == true) // Should we attempt to enable the sensor?
   {
     status = inv_icm20948_enable_dmp_sensor(&_device, sensor, enable == true ? 1 : 0);
-//    debugPrint(F("ICM_20948::enableDMPSensor:  _enabled_Android_0: "));
-//    debugPrintf((int)_device._enabled_Android_0);
-//    debugPrint(F("  _enabled_Android_1: "));
-//    debugPrintf((int)_device._enabled_Android_1);
-//    debugPrint(F("  _dataOutCtl1: "));
-//    debugPrintf((int)_device._dataOutCtl1);
-//    debugPrint(F("  _dataOutCtl2: "));
-//    debugPrintf((int)_device._dataOutCtl2);
-//    debugPrint(F("  _dataRdyStatus: "));
-//    debugPrintf((int)_device._dataRdyStatus);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::enableDMPSensor:  _enabled_Android_0: "));
+    debugPrintf((int)_device._enabled_Android_0);
+    debugPrint(F("  _enabled_Android_1: "));
+    debugPrintf((int)_device._enabled_Android_1);
+    debugPrint(F("  _dataOutCtl1: "));
+    debugPrintf((int)_device._dataOutCtl1);
+    debugPrint(F("  _dataOutCtl2: "));
+    debugPrintf((int)_device._dataOutCtl2);
+    debugPrint(F("  _dataRdyStatus: "));
+    debugPrintf((int)_device._dataRdyStatus);
+    debugPrintln(F(""));
+#endif
     return status;
   }
   return ICM_20948_Stat_DMPNotSupported;
@@ -1074,13 +1413,15 @@ ICM_20948_Status_e ICM_20948::enableDMPSensorInt(enum inv_icm20948_sensor sensor
   if (_device._dmp_firmware_available == true) // Should we attempt to enable the sensor interrupt?
   {
     status = inv_icm20948_enable_dmp_sensor_int(&_device, sensor, enable == true ? 1 : 0);
-//    debugPrint(F("ICM_20948::enableDMPSensorInt:  _enabled_Android_intr_0: "));
-//    debugPrintf((int)_device._enabled_Android_intr_0);
-//    debugPrint(F("  _enabled_Android_intr_1: "));
-//    debugPrintf((int)_device._enabled_Android_intr_1);
-//    debugPrint(F("  _dataIntrCtl: "));
-//    debugPrintf((int)_device._dataIntrCtl);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::enableDMPSensorInt:  _enabled_Android_intr_0: "));
+    debugPrintf((int)_device._enabled_Android_intr_0);
+    debugPrint(F("  _enabled_Android_intr_1: "));
+    debugPrintf((int)_device._enabled_Android_intr_1);
+    debugPrint(F("  _dataIntrCtl: "));
+    debugPrintf((int)_device._dataIntrCtl);
+    debugPrintln(F(""));
+#endif
     return status;
   }
   return ICM_20948_Stat_DMPNotSupported;
@@ -1136,11 +1477,13 @@ ICM_20948_Status_e ICM_20948::setGyroSF(unsigned char div, int gyro_level)
   if (_device._dmp_firmware_available == true) // Should we attempt to set the Gyro SF?
   {
     status = inv_icm20948_set_gyro_sf(&_device, div, gyro_level);
-//    debugPrint(F("ICM_20948::setGyroSF:  pll: "));
-//    debugPrintf((int)_device._gyroSFpll);
-//    debugPrint(F("  Gyro SF is: "));
-//    debugPrintf((int)_device._gyroSF);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::setGyroSF:  pll: "));
+    debugPrintf((int)_device._gyroSFpll);
+    debugPrint(F("  Gyro SF is: "));
+    debugPrintf((int)_device._gyroSF);
+    debugPrintln(F(""));
+#endif
     return status;
   }
   return ICM_20948_Stat_DMPNotSupported;
@@ -1154,7 +1497,9 @@ ICM_20948_Status_e ICM_20948::initializeDMP(void)
   // First, let's check if the DMP is available
   if (_device._dmp_firmware_available != true)
   {
-//    debugPrint(F("ICM_20948::startupDMP: DMP is not available. Please check that you have uncommented line 29 (#define ICM_20948_USE_DMP) in ICM_20948_C.h..."));
+#if 0
+    debugPrint(F("ICM_20948::startupDMP: DMP is not available. Please check that you have uncommented line 29 (#define ICM_20948_USE_DMP) in ICM_20948_C.h..."));
+#endif
     return ICM_20948_Stat_DMPNotSupported;
   }
 
@@ -1213,7 +1558,7 @@ ICM_20948_Status_e ICM_20948::initializeDMP(void)
   // You can see by monitoring the Aux I2C pins that the next three lines reduce the bus traffic (magnetometer reads) from 1125Hz to the chosen rate: 68.75Hz in this case.
   result = setBank(3); if (result > worstResult) worstResult = result; // Select Bank 3
   uint8_t mstODRconfig = 0x04; // Set the ODR configuration to 1100/2^4 = 68.75Hz
-  result = write(AGB3_REG_I2C_MST_ODR_CONFIG, &mstODRconfig, 1); if (result > worstResult) worstResult = result; // Write one byte to the I2C_MST_ODR_CONFIG register
+  result = write(AGB3_REG_I2C_MST_ODR_CONFIG, &mstODRconfig, 1); if (result > worstResult) worstResult = result; // Write one byte to the I2C_MST_ODR_CONFIG register  
 
   // Configure clock source through PWR_MGMT_1
   // ICM_20948_Clock_Auto selects the best available clock source – PLL if ready, else use the Internal oscillator
@@ -1403,30 +1748,31 @@ ICM_20948_I2C::ICM_20948_I2C()
 {
 }
 
-ICM_20948_Status_e ICM_20948_I2C::begin()
+ICM_20948_Status_e ICM_20948_I2C::begin(bool ad0val, uint8_t ad0pin)
 {
   // Associate
-//  _ad0 = ad0pin;
-//  _i2c = &wirePort;
-//  _ad0val = ad0val;
-//
-//  _addr = ICM_20948_I2C_ADDR_AD0;
-//  if (_ad0val)
-//  {
-//    _addr = ICM_20948_I2C_ADDR_AD1;
-//  }
-//
-//  // Set pinmodes
-//  if (_ad0 != ICM_20948_ARD_UNUSED_PIN)
-//  {
+
+  _ad0 = ad0pin;
+
+  _ad0val = ad0val;
+
+  _addr = ICM_20948_I2C_ADDR_AD0;
+  if (_ad0val)
+  {
+    _addr = ICM_20948_I2C_ADDR_AD1;
+  }
+
+  // Set pinmodes
+  if (_ad0 != ICM_20948_ARD_UNUSED_PIN)
+  {
 //    pinMode(_ad0, OUTPUT);
-//  }
-//
-//  // Set pins to default positions
-//  if (_ad0 != ICM_20948_ARD_UNUSED_PIN)
-//  {
+  }
+
+  // Set pins to default positions
+  if (_ad0 != ICM_20948_ARD_UNUSED_PIN)
+  {
 //    digitalWrite(_ad0, _ad0val);
-//  }
+  }
 
   // _i2c->begin(); // Moved into user's sketch
 
@@ -1459,9 +1805,11 @@ ICM_20948_Status_e ICM_20948_I2C::begin()
   status = startupDefault(_device._dmp_firmware_available);
   if (status != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948_I2C::begin: startupDefault returned: "));
-//    debugPrintStatus(status);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948_I2C::begin: startupDefault returned: "));
+    debugPrintStatus(status);
+    debugPrintln(F(""));
+#endif
   }
   return status;
 }
@@ -1494,26 +1842,32 @@ ICM_20948_Status_e ICM_20948::startupMagnetometer(bool minimal)
 
   if (tries == MAX_MAGNETOMETER_STARTS)
   {
-//    debugPrint(F("ICM_20948::startupMagnetometer: reached MAX_MAGNETOMETER_STARTS ("));
-//    debugPrintf((int)MAX_MAGNETOMETER_STARTS);
-//    debugPrintln(F("). Returning ICM_20948_Stat_WrongID"));
+#if 0
+    debugPrint(F("ICM_20948::startupMagnetometer: reached MAX_MAGNETOMETER_STARTS ("));
+    debugPrintf((int)MAX_MAGNETOMETER_STARTS);
+    debugPrintln(F("). Returning ICM_20948_Stat_WrongID"));
+#endif
     status = ICM_20948_Stat_WrongID;
     return status;
   }
   else
   {
-//    debugPrint(F("ICM_20948::startupMagnetometer: successful magWhoIAm after "));
-//    debugPrintf((int)tries);
-//    if (tries == 1)
-//      debugPrintln(F(" try"));
-//    else
-//      debugPrintln(F(" tries"));
+#if 0
+    debugPrint(F("ICM_20948::startupMagnetometer: successful magWhoIAm after "));
+    debugPrintf((int)tries);
+    if (tries == 1)
+      debugPrintln(F(" try"));
+    else
+      debugPrintln(F(" tries"));
+#endif
   }
 
   //Return now if minimal is true. The mag will be configured manually for the DMP
   if (minimal) // Return now if minimal is true
   {
-//    debugPrintln(F("ICM_20948::startupMagnetometer: minimal startup complete!"));
+#if 0
+    debugPrintln(F("ICM_20948::startupMagnetometer: minimal startup complete!"));
+#endif
     return status;
   }
 
@@ -1524,9 +1878,11 @@ ICM_20948_Status_e ICM_20948::startupMagnetometer(bool minimal)
   retval = writeMag(AK09916_REG_CNTL2, (uint8_t *)&reg);
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupMagnetometer: writeMag returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupMagnetometer: writeMag returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -1534,9 +1890,11 @@ ICM_20948_Status_e ICM_20948::startupMagnetometer(bool minimal)
   retval = i2cControllerConfigurePeripheral(0, MAG_AK09916_I2C_ADDR, AK09916_REG_ST1, 9, true, true, false, false, false);
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::startupMagnetometer: i2cMasterConfigurePeripheral returned: "));
-//    debugPrintStatus(retval);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::startupMagnetometer: i2cMasterConfigurePeripheral returned: "));
+    debugPrintStatus(retval);
+    debugPrintln(F(""));
+#endif
     status = retval;
     return status;
   }
@@ -1555,11 +1913,13 @@ ICM_20948_Status_e ICM_20948::magWhoIAm(void)
   retval = status;
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::magWhoIAm: whoiam1: "));
-//    debugPrintf((int)whoiam1);
-//    debugPrint(F(" (should be 72) readMag set status to: "));
-//    debugPrintStatus(status);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::magWhoIAm: whoiam1: "));
+    debugPrintf((int)whoiam1);
+    debugPrint(F(" (should be 72) readMag set status to: "));
+    debugPrintStatus(status);
+    debugPrintln(F(""));
+#endif
     return retval;
   }
   whoiam2 = readMag(AK09916_REG_WIA2);
@@ -1568,13 +1928,15 @@ ICM_20948_Status_e ICM_20948::magWhoIAm(void)
   retval = status;
   if (retval != ICM_20948_Stat_Ok)
   {
-//    debugPrint(F("ICM_20948::magWhoIAm: whoiam1: "));
-//    debugPrintf((int)whoiam1);
-//    debugPrint(F(" (should be 72) whoiam2: "));
-//    debugPrintf((int)whoiam2);
-//    debugPrint(F(" (should be 9) readMag set status to: "));
-//    debugPrintStatus(status);
-//    debugPrintln(F(""));
+#if 0
+    debugPrint(F("ICM_20948::magWhoIAm: whoiam1: "));
+    debugPrintf((int)whoiam1);
+    debugPrint(F(" (should be 72) whoiam2: "));
+    debugPrintf((int)whoiam2);
+    debugPrint(F(" (should be 9) readMag set status to: "));
+    debugPrintStatus(status);
+    debugPrintln(F(""));
+#endif
     return retval;
   }
 
@@ -1584,85 +1946,86 @@ ICM_20948_Status_e ICM_20948::magWhoIAm(void)
     status = retval;
     return status;
   }
-
-//  debugPrint(F("ICM_20948::magWhoIAm: whoiam1: "));
-//  debugPrintf((int)whoiam1);
-//  debugPrint(F(" (should be 72) whoiam2: "));
-//  debugPrintf((int)whoiam2);
-//  debugPrintln(F(" (should be 9). Returning ICM_20948_Stat_WrongID"));
-
+#if 0
+  debugPrint(F("ICM_20948::magWhoIAm: whoiam1: "));
+  debugPrintf((int)whoiam1);
+  debugPrint(F(" (should be 72) whoiam2: "));
+  debugPrintf((int)whoiam2);
+  debugPrintln(F(" (should be 9). Returning ICM_20948_Stat_WrongID"));
+#endif
   retval = ICM_20948_Stat_WrongID;
   status = retval;
   return status;
 }
 
-//// SPI
-//
-//// SPISettings ICM_20948_SPI_DEFAULT_SETTINGS(ICM_20948_SPI_DEFAULT_FREQ, ICM_20948_SPI_DEFAULT_ORDER, ICM_20948_SPI_DEFAULT_MODE);
-//
-//ICM_20948_SPI::ICM_20948_SPI()
-//{
-//}
-//
-//ICM_20948_Status_e ICM_20948_SPI::begin(uint8_t csPin, SPIClass &spiPort, uint32_t SPIFreq)
-//{
-//  if (SPIFreq > 7000000)
-//    SPIFreq = 7000000; // Limit SPI frequency to 7MHz
-//
-//  // Associate
-//  _spi = &spiPort;
-//  _spisettings = SPISettings(SPIFreq, ICM_20948_SPI_DEFAULT_ORDER, ICM_20948_SPI_DEFAULT_MODE);
-//  _cs = csPin;
-//
-//  // Set pinmodes
-//  pinMode(_cs, OUTPUT);
-//
-//  // Set pins to default positions
-//  digitalWrite(_cs, HIGH);
-//
-//  // _spi->begin(); // Moved into user's sketch
-//
-//  // 'Kickstart' the SPI hardware.
-//  _spi->beginTransaction(_spisettings);
-//  _spi->transfer(0x00);
-//  _spi->endTransaction();
-//
-//  // Set up the serif
-//  _serif.write = ICM_20948_write_SPI;
-//  _serif.read = ICM_20948_read_SPI;
-//  _serif.user = (void *)this; // refer to yourself in the user field
-//
-//  // Link the serif
-//  _device._serif = &_serif;
-//
-//#if defined(ICM_20948_USE_DMP)
-//  _device._dmp_firmware_available = true; // Initialize _dmp_firmware_available
-//#else
-//  _device._dmp_firmware_available = false; // Initialize _dmp_firmware_available
-//#endif
-//
-//  _device._firmware_loaded = false; // Initialize _firmware_loaded
-//  _device._last_bank = 255;         // Initialize _last_bank. Make it invalid. It will be set by the first call of ICM_20948_set_bank.
-//  _device._last_mems_bank = 255;    // Initialize _last_mems_bank. Make it invalid. It will be set by the first call of inv_icm20948_write_mems.
-//  _device._gyroSF = 0;              // Use this to record the GyroSF, calculated by inv_icm20948_set_gyro_sf
-//  _device._gyroSFpll = 0;
-//  _device._enabled_Android_0 = 0;      // Keep track of which Android sensors are enabled: 0-31
-//  _device._enabled_Android_1 = 0;      // Keep track of which Android sensors are enabled: 32-
-//  _device._enabled_Android_intr_0 = 0; // Keep track of which Android sensor interrupts are enabled: 0-31
-//  _device._enabled_Android_intr_1 = 0; // Keep track of which Android sensor interrupts are enabled: 32-
-//
-//  // Perform default startup
-//  // Do a minimal startupDefault if using the DMP. User can always call startupDefault(false) manually if required.
-//  status = startupDefault(_device._dmp_firmware_available);
-//  if (status != ICM_20948_Stat_Ok)
-//  {
-//    debugPrint(F("ICM_20948_SPI::begin: startupDefault returned: "));
-//    debugPrintStatus(status);
-//    debugPrintln(F(""));
-//  }
-//
-//  return status;
-//}
+// SPI
+
+// SPISettings ICM_20948_SPI_DEFAULT_SETTINGS(ICM_20948_SPI_DEFAULT_FREQ, ICM_20948_SPI_DEFAULT_ORDER, ICM_20948_SPI_DEFAULT_MODE);
+#if 0
+ICM_20948_SPI::ICM_20948_SPI()
+{
+}
+
+ICM_20948_Status_e ICM_20948_SPI::begin(uint8_t csPin, SPIClass &spiPort, uint32_t SPIFreq)
+{
+  if (SPIFreq > 7000000)
+    SPIFreq = 7000000; // Limit SPI frequency to 7MHz
+
+  // Associate
+  _spi = &spiPort;
+  _spisettings = SPISettings(SPIFreq, ICM_20948_SPI_DEFAULT_ORDER, ICM_20948_SPI_DEFAULT_MODE);
+  _cs = csPin;
+
+  // Set pinmodes
+  pinMode(_cs, OUTPUT);
+
+  // Set pins to default positions
+  digitalWrite(_cs, HIGH);
+
+  // _spi->begin(); // Moved into user's sketch
+
+  // 'Kickstart' the SPI hardware.
+  _spi->beginTransaction(_spisettings);
+  _spi->transfer(0x00);
+  _spi->endTransaction();
+
+  // Set up the serif
+  _serif.write = ICM_20948_write_SPI;
+  _serif.read = ICM_20948_read_SPI;
+  _serif.user = (void *)this; // refer to yourself in the user field
+
+  // Link the serif
+  _device._serif = &_serif;
+
+#if defined(ICM_20948_USE_DMP)
+  _device._dmp_firmware_available = true; // Initialize _dmp_firmware_available
+#else
+  _device._dmp_firmware_available = false; // Initialize _dmp_firmware_available
+#endif
+
+  _device._firmware_loaded = false; // Initialize _firmware_loaded
+  _device._last_bank = 255;         // Initialize _last_bank. Make it invalid. It will be set by the first call of ICM_20948_set_bank.
+  _device._last_mems_bank = 255;    // Initialize _last_mems_bank. Make it invalid. It will be set by the first call of inv_icm20948_write_mems.
+  _device._gyroSF = 0;              // Use this to record the GyroSF, calculated by inv_icm20948_set_gyro_sf
+  _device._gyroSFpll = 0;
+  _device._enabled_Android_0 = 0;      // Keep track of which Android sensors are enabled: 0-31
+  _device._enabled_Android_1 = 0;      // Keep track of which Android sensors are enabled: 32-
+  _device._enabled_Android_intr_0 = 0; // Keep track of which Android sensor interrupts are enabled: 0-31
+  _device._enabled_Android_intr_1 = 0; // Keep track of which Android sensor interrupts are enabled: 32-
+
+  // Perform default startup
+  // Do a minimal startupDefault if using the DMP. User can always call startupDefault(false) manually if required.
+  status = startupDefault(_device._dmp_firmware_available);
+  if (status != ICM_20948_Stat_Ok)
+  {
+    debugPrint(F("ICM_20948_SPI::begin: startupDefault returned: "));
+    debugPrintStatus(status);
+    debugPrintln(F(""));
+  }
+
+  return status;
+}
+#endif
 
 // serif functions for the I2C and SPI classes
 ICM_20948_Status_e ICM_20948_write_I2C(uint8_t reg, uint8_t *data, uint32_t len, void *user)
@@ -1671,19 +2034,22 @@ ICM_20948_Status_e ICM_20948_write_I2C(uint8_t reg, uint8_t *data, uint32_t len,
   {
     return ICM_20948_Stat_ParamErr;
   }
-//  TwoWire *_i2c = ((ICM_20948_I2C *)user)->_i2c; // Cast user field to ICM_20948_I2C type and extract the I2C interface pointer
-//  uint8_t addr = ((ICM_20948_I2C *)user)->_addr;
-//  if (_i2c == NULL)
-//  {
-//    return ICM_20948_Stat_ParamErr;
-//  }
+#if 1
+  uint8_t addr = ((ICM_20948_I2C *)user)->_addr;
+  I2C_write(addr, reg, len, data);
+#else
+  TwoWire *_i2c = ((ICM_20948_I2C *)user)->_i2c; // Cast user field to ICM_20948_I2C type and extract the I2C interface pointer
+  uint8_t addr = ((ICM_20948_I2C *)user)->_addr;
+  if (_i2c == NULL)
+  {
+    return ICM_20948_Stat_ParamErr;
+  }
 
-//  _i2c->beginTransmission(addr);
-//  _i2c->write(reg);
-//  _i2c->write(data, (uint8_t)len);
-//  _i2c->endTransmission();
-
-  I2C_write(0x69, reg, len, data);
+  _i2c->beginTransmission(addr);
+  _i2c->write(reg);
+  _i2c->write(data, (uint8_t)len);
+  _i2c->endTransmission();
+#endif
 
   // for( uint32_t indi = 0; indi < len; indi++ ){
   //     _i2c->beginTransmission(addr);
@@ -1704,33 +2070,45 @@ ICM_20948_Status_e ICM_20948_read_I2C(uint8_t reg, uint8_t *buff, uint32_t len, 
   {
     return ICM_20948_Stat_ParamErr;
   }
-//  TwoWire *_i2c = ((ICM_20948_I2C *)user)->_i2c;
-//  uint8_t addr = ((ICM_20948_I2C *)user)->_addr;
-//  if (_i2c == NULL)
-//  {
-//    return ICM_20948_Stat_ParamErr;
-//  }
+#if 1
+  uint8_t addr = ((ICM_20948_I2C *)user)->_addr;
 
-//  _i2c->beginTransmission(addr);
-//  _i2c->write(reg);
-//  _i2c->endTransmission(false); // Send repeated start
-//
-//  uint32_t num_received = _i2c->requestFrom(addr, len);
-//
-//  if (num_received == len)
-//  {
-//    for (uint8_t i = 0; i < len; i++)
-//    {
-//      buff[i] = _i2c->read();
-//    }
-
-  I2C_read(0x69, reg, len, buff);
+  if ( I2C_read(addr, reg, len, buff) == HAL_OK )
+  {
     return ICM_20948_Stat_Ok;
-//  }
-//  else
-//  {
-//    return ICM_20948_Stat_NoData;
-//  }
+  }
+  else
+  {
+    return ICM_20948_Stat_NoData;
+  }
+
+#else
+  TwoWire *_i2c = ((ICM_20948_I2C *)user)->_i2c;
+  uint8_t addr = ((ICM_20948_I2C *)user)->_addr;
+  if (_i2c == NULL)
+  {
+    return ICM_20948_Stat_ParamErr;
+  }
+
+  _i2c->beginTransmission(addr);
+  _i2c->write(reg);
+  _i2c->endTransmission(false); // Send repeated start
+
+  uint32_t num_received = _i2c->requestFrom(addr, len);
+
+  if (num_received == len)
+  {
+    for (uint8_t i = 0; i < len; i++)
+    {
+      buff[i] = _i2c->read();
+    }
+    return ICM_20948_Stat_Ok;
+  }
+  else
+  {
+    return ICM_20948_Stat_NoData;
+  }
+#endif
 
   if (len != 0)
   {
@@ -1739,75 +2117,76 @@ ICM_20948_Status_e ICM_20948_read_I2C(uint8_t reg, uint8_t *buff, uint32_t len, 
   return ICM_20948_Stat_Ok;
 }
 
-//ICM_20948_Status_e ICM_20948_write_SPI(uint8_t reg, uint8_t *data, uint32_t len, void *user)
-//{
-//  if (user == NULL)
-//  {
-//    return ICM_20948_Stat_ParamErr;
-//  }
-//  SPIClass *_spi = ((ICM_20948_SPI *)user)->_spi; // Cast user field to ICM_20948_SPI type and extract the SPI interface pointer
-//  uint8_t cs = ((ICM_20948_SPI *)user)->_cs;
-//  SPISettings spisettings = ((ICM_20948_SPI *)user)->_spisettings;
-//  if (_spi == NULL)
-//  {
-//    return ICM_20948_Stat_ParamErr;
-//  }
-//
-//  // 'Kickstart' the SPI hardware. This is a fairly high amount of overhead, but it guarantees that the lines will start in the correct states even when sharing the SPI bus with devices that use other modes
-//  _spi->beginTransaction(spisettings);
-//  _spi->transfer(0x00);
-//  _spi->endTransaction();
-//
-//  _spi->beginTransaction(spisettings);
-//  digitalWrite(cs, LOW);
-//  // delayMicroseconds(5);
-//  _spi->transfer(((reg & 0x7F) | 0x00));
-//  //  SPI.transfer(data, len); // Can't do this thanks to Arduino's poor implementation
-//  for (uint32_t indi = 0; indi < len; indi++)
-//  {
-//    _spi->transfer(*(data + indi));
-//  }
-//  // delayMicroseconds(5);
-//  digitalWrite(cs, HIGH);
-//  _spi->endTransaction();
-//
-//  return ICM_20948_Stat_Ok;
-//}
-//
-//ICM_20948_Status_e ICM_20948_read_SPI(uint8_t reg, uint8_t *buff, uint32_t len, void *user)
-//{
-//  if (user == NULL)
-//  {
-//    return ICM_20948_Stat_ParamErr;
-//  }
-//  SPIClass *_spi = ((ICM_20948_SPI *)user)->_spi;
-//  uint8_t cs = ((ICM_20948_SPI *)user)->_cs;
-//  SPISettings spisettings = ((ICM_20948_SPI *)user)->_spisettings;
-//  if (_spi == NULL)
-//  {
-//    return ICM_20948_Stat_ParamErr;
-//  }
-//
-//  // 'Kickstart' the SPI hardware. This is a fairly high amount of overhead, but it guarantees that the lines will start in the correct states
-//  _spi->beginTransaction(spisettings);
-//  _spi->transfer(0x00);
-//  _spi->endTransaction();
-//
-//  _spi->beginTransaction(spisettings);
-//  digitalWrite(cs, LOW);
-//  //   delayMicroseconds(5);
-//  _spi->transfer(((reg & 0x7F) | 0x80));
-//  //  SPI.transfer(data, len); // Can't do this thanks to Arduino's stupid implementation
-//  for (uint32_t indi = 0; indi < len; indi++)
-//  {
-//    *(buff + indi) = _spi->transfer(0x00);
-//  }
-//  //   delayMicroseconds(5);
-//  digitalWrite(cs, HIGH);
-//  _spi->endTransaction();
-//
-//  return ICM_20948_Stat_Ok;
-//}
+#if 0
+ICM_20948_Status_e ICM_20948_write_SPI(uint8_t reg, uint8_t *data, uint32_t len, void *user)
+{
+  if (user == NULL)
+  {
+    return ICM_20948_Stat_ParamErr;
+  }
+  SPIClass *_spi = ((ICM_20948_SPI *)user)->_spi; // Cast user field to ICM_20948_SPI type and extract the SPI interface pointer
+  uint8_t cs = ((ICM_20948_SPI *)user)->_cs;
+  SPISettings spisettings = ((ICM_20948_SPI *)user)->_spisettings;
+  if (_spi == NULL)
+  {
+    return ICM_20948_Stat_ParamErr;
+  }
 
+  // 'Kickstart' the SPI hardware. This is a fairly high amount of overhead, but it guarantees that the lines will start in the correct states even when sharing the SPI bus with devices that use other modes
+  _spi->beginTransaction(spisettings);
+  _spi->transfer(0x00);
+  _spi->endTransaction();
+
+  _spi->beginTransaction(spisettings);
+  digitalWrite(cs, LOW);
+  // delayMicroseconds(5);
+  _spi->transfer(((reg & 0x7F) | 0x00));
+  //  SPI.transfer(data, len); // Can't do this thanks to Arduino's poor implementation
+  for (uint32_t indi = 0; indi < len; indi++)
+  {
+    _spi->transfer(*(data + indi));
+  }
+  // delayMicroseconds(5);
+  digitalWrite(cs, HIGH);
+  _spi->endTransaction();
+
+  return ICM_20948_Stat_Ok;
+}
+
+ICM_20948_Status_e ICM_20948_read_SPI(uint8_t reg, uint8_t *buff, uint32_t len, void *user)
+{
+  if (user == NULL)
+  {
+    return ICM_20948_Stat_ParamErr;
+  }
+  SPIClass *_spi = ((ICM_20948_SPI *)user)->_spi;
+  uint8_t cs = ((ICM_20948_SPI *)user)->_cs;
+  SPISettings spisettings = ((ICM_20948_SPI *)user)->_spisettings;
+  if (_spi == NULL)
+  {
+    return ICM_20948_Stat_ParamErr;
+  }
+
+  // 'Kickstart' the SPI hardware. This is a fairly high amount of overhead, but it guarantees that the lines will start in the correct states
+  _spi->beginTransaction(spisettings);
+  _spi->transfer(0x00);
+  _spi->endTransaction();
+
+  _spi->beginTransaction(spisettings);
+  digitalWrite(cs, LOW);
+  //   delayMicroseconds(5);
+  _spi->transfer(((reg & 0x7F) | 0x80));
+  //  SPI.transfer(data, len); // Can't do this thanks to Arduino's stupid implementation
+  for (uint32_t indi = 0; indi < len; indi++)
+  {
+    *(buff + indi) = _spi->transfer(0x00);
+  }
+  //   delayMicroseconds(5);
+  digitalWrite(cs, HIGH);
+  _spi->endTransaction();
+
+  return ICM_20948_Stat_Ok;
+}
+#endif
 
 

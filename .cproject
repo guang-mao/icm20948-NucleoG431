@@ -50,10 +50,16 @@
 									<listOptionValue builtIn="false" value="../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32G4xx/Include"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/MadgwickAHRS"/>
-									<listOptionValue builtIn="false" value="../Drivers/MahonyAHRS"/>
+									<listOptionValue builtIn="false" value="../Drivers/Adafruit_AHRS"/>
+									<listOptionValue builtIn="false" value="../Drivers/Adafruit_AHRS/MadgwickAHRS"/>
+									<listOptionValue builtIn="false" value="../Drivers/Adafruit_AHRS/MahonyAHRS"/>
 									<listOptionValue builtIn="false" value="../Drivers/ICM-20948"/>
 									<listOptionValue builtIn="false" value="../Drivers/ICM-20948/Inc"/>
+									<listOptionValue builtIn="false" value="../Drivers/uNavAHRS"/>
+									<listOptionValue builtIn="false" value="../Drivers/eigen"/>
+									<listOptionValue builtIn="false" value="../Drivers/eigen/src"/>
+									<listOptionValue builtIn="false" value="../Drivers/eigen/src/Eigen"/>
+									<listOptionValue builtIn="false" value="../Drivers/eigen/src/Eigen/src"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.660124348" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -66,10 +72,16 @@
 									<listOptionValue builtIn="false" value="../Drivers/STM32G4xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Device/ST/STM32G4xx/Include"/>
 									<listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
-									<listOptionValue builtIn="false" value="../Drivers/MadgwickAHRS"/>
-									<listOptionValue builtIn="false" value="../Drivers/MahonyAHRS"/>
+									<listOptionValue builtIn="false" value="../Drivers/Adafruit_AHRS"/>
+									<listOptionValue builtIn="false" value="../Drivers/Adafruit_AHRS/MadgwickAHRS"/>
+									<listOptionValue builtIn="false" value="../Drivers/Adafruit_AHRS/MahonyAHRS"/>
 									<listOptionValue builtIn="false" value="../Drivers/ICM-20948/Inc"/>
 									<listOptionValue builtIn="false" value="../Drivers/ICM-20948"/>
+									<listOptionValue builtIn="false" value="../Drivers/uNavAHRS"/>
+									<listOptionValue builtIn="false" value="../Drivers/eigen"/>
+									<listOptionValue builtIn="false" value="../Drivers/eigen/src"/>
+									<listOptionValue builtIn="false" value="../Drivers/eigen/src/Eigen"/>
+									<listOptionValue builtIn="false" value="../Drivers/eigen/src/Eigen/src"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.definedsymbols.356284014" name="Define symbols (-D)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.option.definedsymbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="DEBUG"/>
@@ -106,7 +118,7 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
-						<entry excluding="MahonyAHRS" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+						<entry excluding="eigen/examples|MahonyAHRS/bakup|MadgwickAHRS/bakup|ICM-20948/Src/bakup|ICM-20948/Inc/bakup" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

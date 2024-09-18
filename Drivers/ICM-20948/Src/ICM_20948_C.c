@@ -10,10 +10,10 @@
 
 #if defined(ARDUINO_ARCH_MBED) // ARDUINO_ARCH_MBED (APOLLO3 v2) does not support or require pgmspace.h / PROGMEM
 const uint8_t dmp3_image[] = {
-//#elif (defined(__AVR__) || defined(__arm__) || defined(__ARDUINO_ARC__)) && !defined(__linux__) // Store the DMP firmware in PROGMEM on older AVR (ATmega) platforms
-//#define ICM_20948_USE_PROGMEM_FOR_DMP
-//#include <avr/pgmspace.h>
-//const uint8_t dmp3_image[] PROGMEM = {
+#elif (defined(__AVR__) || defined(__arm__) || defined(__ARDUINO_ARC__) || defined(ESP8266)) && !defined(__linux__) // Store the DMP firmware in PROGMEM on older AVR (ATmega) platforms
+#define ICM_20948_USE_PROGMEM_FOR_DMP
+#include <avr/pgmspace.h>
+const uint8_t dmp3_image[] PROGMEM = {
 #else
 const uint8_t dmp3_image[] = {
 #endif
@@ -555,6 +555,41 @@ ICM_20948_Status_e ICM_20948_int_enable(ICM_20948_Device_t *pdev, ICM_20948_INT_
   return retval;
 }
 
+ICM_20948_Status_e ICM_20948_wom_logic(ICM_20948_Device_t *pdev, ICM_20948_ACCEL_INTEL_CTRL_t *write, ICM_20948_ACCEL_INTEL_CTRL_t *read)
+{
+  ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
+
+  ICM_20948_ACCEL_INTEL_CTRL_t ctrl;
+
+  retval = ICM_20948_set_bank(pdev, 2); // Must be in the right bank
+
+  if (write != NULL)
+  { // If the write pointer is not NULL then write to the registers BEFORE reading
+    ctrl.ACCEL_INTEL_EN = write->ACCEL_INTEL_EN;
+    ctrl.ACCEL_INTEL_MODE_INT = write->ACCEL_INTEL_MODE_INT;
+
+    retval = ICM_20948_execute_w(pdev, AGB2_REG_ACCEL_INTEL_CTRL, (uint8_t *)&ctrl, sizeof(ICM_20948_ACCEL_INTEL_CTRL_t));
+    if (retval != ICM_20948_Stat_Ok)
+    {
+      return retval;
+    }
+  }
+
+  if (read != NULL)
+  { // If read pointer is not NULL then read the registers (if write is not NULL then this should read back the results of write into read)
+    retval = ICM_20948_execute_r(pdev, AGB2_REG_ACCEL_INTEL_CTRL, (uint8_t *)&ctrl, sizeof(ICM_20948_ACCEL_INTEL_CTRL_t));
+    if (retval != ICM_20948_Stat_Ok)
+    {
+      return retval;
+    }
+
+    read->ACCEL_INTEL_EN = ctrl.ACCEL_INTEL_EN;
+    read->ACCEL_INTEL_MODE_INT = ctrl.ACCEL_INTEL_MODE_INT;
+  }
+
+  return retval;
+}
+
 ICM_20948_Status_e ICM_20948_wom_threshold(ICM_20948_Device_t *pdev, ICM_20948_ACCEL_WOM_THR_t *write, ICM_20948_ACCEL_WOM_THR_t *read)
 {
   ICM_20948_Status_e retval = ICM_20948_Stat_Ok;
@@ -792,7 +827,7 @@ ICM_20948_Status_e ICM_20948_set_sample_rate(ICM_20948_Device_t *pdev, ICM_20948
   if (sensors & ICM_20948_Internal_Acc)
   {
     retval |= ICM_20948_set_bank(pdev, 2); // Must be in the right bank
-    uint8_t div1 = (smplrt.a << 8);
+    uint8_t div1 = (smplrt.a >> 8); // Thank you @yanivamichy #109
     uint8_t div2 = (smplrt.a & 0xFF);
     retval |= ICM_20948_execute_w(pdev, AGB2_REG_ACCEL_SMPLRT_DIV_1, &div1, 1);
     retval |= ICM_20948_execute_w(pdev, AGB2_REG_ACCEL_SMPLRT_DIV_2, &div2, 1);
@@ -1977,7 +2012,7 @@ ICM_20948_Status_e inv_icm20948_read_dmp_data(ICM_20948_Device_t *pdev, icm_2094
     return result;
   for (int i = 0; i < icm_20948_DMP_Header_Bytes; i++)
   {
-    aShort |= ((uint16_t)fifoBytes[i]) << (8 - (i * 8));
+    aShort |= ((uint16_t)fifoBytes[i]) << (8 - (i * 8)); // MSB first
   }
   data->header = aShort;                    // Store the header in data->header
   fifo_count -= icm_20948_DMP_Header_Bytes; // Decrement the count
@@ -2248,7 +2283,7 @@ ICM_20948_Status_e inv_icm20948_read_dmp_data(ICM_20948_Device_t *pdev, icm_2094
     uint32_t aWord = 0;
     for (int i = 0; i < icm_20948_DMP_Step_Detector_Bytes; i++)
     {
-      aWord |= ((uint32_t)fifoBytes[i]) << (24 - (i * 8));
+      aWord |= ((uint32_t)fifoBytes[i]) << (24 - (i * 8)); // MSB first
     }
     data->Pedometer_Timestamp = aWord;
     fifo_count -= icm_20948_DMP_Step_Detector_Bytes; // Decrement the count
@@ -2589,7 +2624,9 @@ ICM_20948_Status_e inv_icm20948_set_gyro_sf(ICM_20948_Device_t *pdev, unsigned c
   gyro_sf_reg[1] = (unsigned char)(gyro_sf >> 16);
   gyro_sf_reg[2] = (unsigned char)(gyro_sf >> 8);
   gyro_sf_reg[3] = (unsigned char)(gyro_sf & 0xff);
-  result = inv_icm20948_write_mems(pdev, GYRO_SF, 4, (const unsigned char *)&gyro_sf_reg);
+  result = inv_icm20948_write_mems(pdev, GYRO_SF, 4, (const unsigned char*)&gyro_sf_reg);
 
   return result;
 }
+
+
